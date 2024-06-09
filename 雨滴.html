@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<meta charset="utf-8" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+	<title>WebCat</title>
+ <style>
+ body{margin:0;}
+ canvas{background:#000}
+ </style>
+  </head>
+  <body>
+  	
+<canvas id="canvas"></canvas>
+<script src="../tools.js"></script>
+<script>
+
+var canvas=document.querySelector("#canvas");
+
+var bw,bh;
+var aRain=[];
+(function setSize(){
+    window.onresize=arguments.callee;//setSize;
+    bw=window.innerWidth;
+    bh=window.innerHeight;
+    canvas.width=bw;
+    canvas.height=bh;
+})();   
+
+var ctx=canvas.getContext("2d");//获取画布
+
+function random(min,max){
+  return Math.random()*(max-min)+min;
+}
+
+function Rain(){};
+Rain.prototype={
+  init:function(){
+    this.x=random(0,bw);
+    this.y=0;
+    this.w=3;
+    this.h=7;
+    this.color="#3ff";    
+    this.vy=random(2,3);
+    this.raflh=random(0.8*bh,0.9*bh);
+    this.arcR=2;
+    this.maxarcR=random(60,75);
+  },
+  draw:function(){
+    if(this.y<this.raflh){ 
+      ctx.fillStyle=this.color;
+      ctx.fillRect(this.x,this.y,this.w,this.h);    
+    }else{
+      ctx.beginPath();
+      ctx.strokeStyle=this.color;
+      ctx.arc(this.x,this.y,this.arcR,0,Math.PI*2);
+      ctx.stroke();
+    }
+  },
+  play:function(){
+    if(this.y<this.raflh){
+      this.y+=this.vy;
+    }else if(this.arcR<this.maxarcR){
+      this.arcR++;
+    }else{
+      this.init();
+    }
+    this.draw();
+ },
+}//类结束
+
+function createRain(num,time){
+   for(var i=0;i<num;i++){
+     var timer=setTimeout(function(){
+       var rain=new Rain();
+       rain.init();
+       rain.draw(); 
+       aRain.push(rain);
+     },time*i);
+   } 
+} 
+createRain(100,200); 
+
+var timerFor=setInterval(function(){
+  ctx.fillStyle='rgba(0,0,0,0.05)';  
+  ctx.fillRect(0,0,bw,bh); 
+  for(var item of aRain){
+    item.play(); 
+  }    
+},1000/60);
+
+</script>
+</body>
+</html>
+
+
+
+
